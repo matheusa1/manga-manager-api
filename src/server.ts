@@ -9,6 +9,6 @@ app.use(express.json())
 app.use(cors())
 app.use(router)
 
-app.listen(8080, 'manga-manager-api.vercel.app' , () =>
+app.listen(3333, '192.168.1.15', () =>
   console.log(`Server listening on port ${process.env.PORT}`),
 )
