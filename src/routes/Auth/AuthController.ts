@@ -39,7 +39,7 @@ export const Register = async (req: Request, res: Response) => {
 
     return res.status(201).send({
       message: 'User created',
-      user: { id: newUser.id, name: newUser.name, email: newUser.email },
+      user: { id: newUser.UserID, name: newUser.name, email: newUser.email },
     })
   } catch (error: any) {
     return res.status(500).send({ error: error.message })
@@ -68,7 +68,7 @@ export const Login = async (req: Request, res: Response) => {
     const token = jwt.sign(user, 'mangaManager')
 
     return res.status(200).send({
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: user.UserID, name: user.name, email: user.email },
       token,
     })
   } catch (error: any) {

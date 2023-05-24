@@ -11,10 +11,25 @@ datasource db {
 }
 
 model user {
-  id        Int      @id @unique @default(autoincrement())
+  UserID    Int      @id @unique @default(autoincrement())
   name      String
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  mangas    manga[]
+}
+
+model manga {
+  MangaID       Int      @id @unique @default(autoincrement())
+  title         String
+  image_url     String
+  volumes       Int
+  volumesOwned  String?
+  myAnimeListID Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  userRelation Int?  @default(0)
+  user         user? @relation(fields: [userRelation], references: [UserID])
 }
