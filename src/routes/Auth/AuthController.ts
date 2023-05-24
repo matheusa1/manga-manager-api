@@ -29,7 +29,7 @@ export const Register = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(12)
     const passwordHash = await bcrypt.hash(password, salt)
 
-    const transaction = await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name,
         email,
@@ -37,7 +37,10 @@ export const Register = async (req: Request, res: Response) => {
       },
     })
 
-    return res.status(201).send(transaction)
+    return res.status(201).send({
+      message: 'User created',
+      user: { id: newUser.id, name: newUser.name, email: newUser.email },
+    })
   } catch (error: any) {
     return res.status(500).send({ error: error.message })
   }
