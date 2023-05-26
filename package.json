@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "manga manager api",
   "main": "index.js",
+  "engine": {
+    "node": "18"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup src",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/server"
+    "dev": "tsx watch src/server",
+    "start": "node dist/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -30,6 +34,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
     "prisma": "^4.14.1",
+    "tsup": "^6.7.0",
     "tsx": "^3.12.7",
     "typescript": "^5.0.4"
   }
