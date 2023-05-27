@@ -55,7 +55,7 @@ var checkToken = async (req, res, next) => {
   const token = GetToken_default(req);
   const id = Number(req.params.id);
   if (!token)
-    return res.status(401).send({ error: "No token provided" });
+    return res.status(401).send({ error: "Invalid Token" });
   try {
     const verified = import_jsonwebtoken.default.verify(token, "mangaManager");
     const user = prisma.user.findUnique({
@@ -68,10 +68,10 @@ var checkToken = async (req, res, next) => {
     if (!user)
       return res.status(401).send({ error: "Invalid Token" });
     if (id !== verified.UserID)
-      return res.status(401).send({ error: "Access Denied" });
+      return res.status(403).send({ error: "Access Denied" });
     next();
   } catch (error) {
-    return res.status(500).send("Token invalido");
+    return res.status(500).send({ error });
   }
 };
 var VerifyToken_default = checkToken;

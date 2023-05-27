@@ -6,17 +6,9 @@ export const CreateManga = async (req: Request, res: Response) => {
   const { title, image_url, volumes, myAnimeListID } = req.body
 
   if (!title || !image_url || !volumes || !myAnimeListID)
-    return res.status(400).send({ error: 'Missing body parameter' })
+    return res.status(422).send({ error: 'Missing body parameter' })
 
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        UserID: id,
-      },
-    })
-
-    if (!user) return res.status(404).send({ error: 'User not found' })
-
     const manga = await prisma.manga.findMany({
       where: {
         myAnimeListID,
@@ -28,7 +20,7 @@ export const CreateManga = async (req: Request, res: Response) => {
     console.log({ manga })
 
     if (manga.length > 0)
-      return res.status(400).send({ error: 'Manga already exists' })
+      return res.status(409).send({ error: 'Manga already exists' })
 
     const newManga = await prisma.manga.create({
       data: {

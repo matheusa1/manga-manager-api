@@ -7,7 +7,7 @@ const checkToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = getToken(req)
   const id = Number(req.params.id)
 
-  if (!token) return res.status(401).send({ error: 'No token provided' })
+  if (!token) return res.status(401).send({ error: 'Invalid Token' })
 
   try {
     const verified = jwt.verify(token, 'mangaManager')
@@ -25,11 +25,11 @@ const checkToken = async (req: Request, res: Response, next: NextFunction) => {
     //eslint-disable-next-line
     //@ts-ignore
     if (id !== verified.UserID)
-      return res.status(401).send({ error: 'Access Denied' })
+      return res.status(403).send({ error: 'Access Denied' })
 
     next()
   } catch (error) {
-    return res.status(500).send('Token invalido')
+    return res.status(500).send({ error })
   }
 }
 
