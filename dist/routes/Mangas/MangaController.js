@@ -60,7 +60,7 @@ var CreateManga = async (req, res) => {
         title,
         image_url,
         volumes,
-        volumesOwned: "",
+        volumesOwned: [],
         myAnimeListID,
         user: {
           connect: {
@@ -84,7 +84,8 @@ var updateManga = async (req, res) => {
         MangaID
       },
       data: {
-        volumesOwned
+        volumesOwned,
+        updatedAt: /* @__PURE__ */ new Date()
       }
     });
     return res.status(200).send({ message: "Manga updated successfully" });
