@@ -35,7 +35,7 @@ export const CreateManga = async (req: Request, res: Response) => {
         title,
         image_url,
         volumes,
-        volumesOwned: '',
+        volumesOwned: [],
         myAnimeListID,
         user: {
           connect: {
@@ -64,6 +64,7 @@ export const updateManga = async (req: Request, res: Response) => {
       },
       data: {
         volumesOwned,
+        updatedAt: new Date(),
       },
     })
 
@@ -81,7 +82,7 @@ export const deleteManga = async (req: Request, res: Response) => {
   try {
     await prisma.manga.delete({
       where: {
-        MangaID
+        MangaID,
       },
     })
 
