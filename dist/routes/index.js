@@ -168,6 +168,28 @@ var updateManga = async (req, res) => {
     res.status(500).send({ error });
   }
 };
+var deleteManga = async (req, res) => {
+  const { MangaID } = req.body;
+  if (!MangaID)
+    return res.status(400).send({ error: "Missing id parameter" });
+  try {
+    const manga = await prisma.manga.findUnique({
+      where: {
+        MangaID
+      }
+    });
+    if (!manga)
+      return res.status(404).send({ error: "Manga doesnt exist" });
+    await prisma.manga.delete({
+      where: {
+        MangaID
+      }
+    });
+    return res.status(200).send({ message: "Manga deleted successfully" });
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+};
 
 // src/Helpers/VerifyToken.ts
 var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
@@ -213,7 +235,7 @@ var VerifyToken_default = checkToken;
 var router2 = (0, import_express2.Router)();
 router2.post("/:id", VerifyToken_default, CreateManga);
 router2.put("/:id", VerifyToken_default, updateManga);
-router2.delete("/:id", VerifyToken_default, updateManga);
+router2.delete("/:id", VerifyToken_default, deleteManga);
 var MangaRoutes_default = router2;
 
 // src/routes/User/UserRoutes.ts

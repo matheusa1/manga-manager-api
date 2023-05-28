@@ -91,6 +91,13 @@ var deleteManga = async (req, res) => {
   if (!MangaID)
     return res.status(400).send({ error: "Missing id parameter" });
   try {
+    const manga = await prisma.manga.findUnique({
+      where: {
+        MangaID
+      }
+    });
+    if (!manga)
+      return res.status(404).send({ error: "Manga doesnt exist" });
     await prisma.manga.delete({
       where: {
         MangaID
