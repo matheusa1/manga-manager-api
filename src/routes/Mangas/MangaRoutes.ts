@@ -6,6 +6,6 @@ const router: Router = Router()
 
 router.post('/:id', checkToken, CreateManga)
 router.put('/:id', checkToken, updateManga)
-router.delete('/:id', checkToken, deleteManga)
+router.delete('/:id/:MangaID', checkToken, deleteManga)
 
 export default router

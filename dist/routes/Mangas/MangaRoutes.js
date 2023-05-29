@@ -96,7 +96,7 @@ var updateManga = async (req, res) => {
   }
 };
 var deleteManga = async (req, res) => {
-  const { MangaID } = req.body;
+  const MangaID = Number(req.params.MangaID);
   if (!MangaID)
     return res.status(400).send({ error: "Missing id parameter" });
   try {
@@ -162,5 +162,5 @@ var VerifyToken_default = checkToken;
 var router = (0, import_express.Router)();
 router.post("/:id", VerifyToken_default, CreateManga);
 router.put("/:id", VerifyToken_default, updateManga);
-router.delete("/:id", VerifyToken_default, deleteManga);
+router.delete("/:id/:MangaID", VerifyToken_default, deleteManga);
 var MangaRoutes_default = router;

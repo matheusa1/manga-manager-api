@@ -67,8 +67,7 @@ export const updateManga = async (req: Request, res: Response) => {
 }
 
 export const deleteManga = async (req: Request, res: Response) => {
-  const { MangaID } = req.body
-
+  const MangaID = Number(req.params.MangaID)
   if (!MangaID) return res.status(400).send({ error: 'Missing id parameter' })
 
   try {

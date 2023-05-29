@@ -87,7 +87,7 @@ var updateManga = async (req, res) => {
   }
 };
 var deleteManga = async (req, res) => {
-  const { MangaID } = req.body;
+  const MangaID = Number(req.params.MangaID);
   if (!MangaID)
     return res.status(400).send({ error: "Missing id parameter" });
   try {
