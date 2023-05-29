@@ -97,24 +97,28 @@ var updateManga = async (req, res) => {
 };
 var deleteManga = async (req, res) => {
   const MangaID = Number(req.params.MangaID);
+  const id = Number(req.params.id);
   if (!MangaID)
     return res.status(400).send({ error: "Missing id parameter" });
   try {
-    const manga = await prisma.manga.findUnique({
+    const manga = await prisma.manga.findMany({
       where: {
-        MangaID
+        myAnimeListID: MangaID,
+        user: {
+          UserID: id
+        }
       }
     });
-    if (!manga)
+    if (manga.length < 1)
       return res.status(404).send({ error: "Manga doesnt exist" });
     await prisma.manga.delete({
       where: {
-        MangaID
+        MangaID: manga[0].MangaID
       }
     });
     return res.status(200).send({ message: "Manga deleted successfully" });
   } catch (error) {
-    res.status(500).send({ error });
+    res.status(500).send(error);
   }
 };
 
