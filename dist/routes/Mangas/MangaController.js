@@ -22,7 +22,8 @@ var MangaController_exports = {};
 __export(MangaController_exports, {
   CreateManga: () => CreateManga,
   deleteManga: () => deleteManga,
-  updateManga: () => updateManga
+  updateMangaVolumes: () => updateMangaVolumes,
+  updateMangaVolumesOwned: () => updateMangaVolumesOwned
 });
 module.exports = __toCommonJS(MangaController_exports);
 
@@ -67,11 +68,18 @@ var CreateManga = async (req, res) => {
     res.status(500).send({ error });
   }
 };
-var updateManga = async (req, res) => {
+var updateMangaVolumesOwned = async (req, res) => {
   const { volumesOwned, MangaID } = req.body;
   if (!volumesOwned)
     return res.status(400).send({ error: "Missing volumesOwned parameter" });
   try {
+    const manga = await prisma.manga.findMany({
+      where: {
+        MangaID
+      }
+    });
+    if (manga.length < 1)
+      return res.status(404).send({ error: "Manga doesnt exist" });
     await prisma.manga.update({
       where: {
         MangaID
@@ -112,9 +120,29 @@ var deleteManga = async (req, res) => {
     res.status(500).send(error);
   }
 };
+var updateMangaVolumes = async (req, res) => {
+  const { volumes, MangaID } = req.body;
+  if (!volumes)
+    return res.status(400).send({ error: "Missing volumes" });
+  try {
+    await prisma.manga.update({
+      where: {
+        MangaID
+      },
+      data: {
+        volumes,
+        updatedAt: /* @__PURE__ */ new Date()
+      }
+    });
+    return res.status(200).send({ message: "Manga updated successfully" });
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   CreateManga,
   deleteManga,
-  updateManga
+  updateMangaVolumes,
+  updateMangaVolumesOwned
 });

@@ -295,11 +295,18 @@ var CreateManga = async (req, res) => {
     res.status(500).send({ error });
   }
 };
-var updateManga = async (req, res) => {
+var updateMangaVolumesOwned = async (req, res) => {
   const { volumesOwned, MangaID } = req.body;
   if (!volumesOwned)
     return res.status(400).send({ error: "Missing volumesOwned parameter" });
   try {
+    const manga = await prisma.manga.findMany({
+      where: {
+        MangaID
+      }
+    });
+    if (manga.length < 1)
+      return res.status(404).send({ error: "Manga doesnt exist" });
     await prisma.manga.update({
       where: {
         MangaID
@@ -338,6 +345,25 @@ var deleteManga = async (req, res) => {
     return res.status(200).send({ message: "Manga deleted successfully" });
   } catch (error) {
     res.status(500).send(error);
+  }
+};
+var updateMangaVolumes = async (req, res) => {
+  const { volumes, MangaID } = req.body;
+  if (!volumes)
+    return res.status(400).send({ error: "Missing volumes" });
+  try {
+    await prisma.manga.update({
+      where: {
+        MangaID
+      },
+      data: {
+        volumes,
+        updatedAt: /* @__PURE__ */ new Date()
+      }
+    });
+    return res.status(200).send({ message: "Manga updated successfully" });
+  } catch (error) {
+    res.status(500).send({ error });
   }
 };
 
@@ -384,8 +410,9 @@ var VerifyToken_default = checkToken;
 // src/routes/Mangas/MangaRoutes.ts
 var router2 = (0, import_express2.Router)();
 router2.post("/:id", VerifyToken_default, CreateManga);
-router2.put("/:id", VerifyToken_default, updateManga);
+router2.put("/volumes-owned/:id", VerifyToken_default, updateMangaVolumesOwned);
 router2.delete("/:id/:MangaID", VerifyToken_default, deleteManga);
+router2.put("/volumes/:id", VerifyToken_default, updateMangaVolumes);
 var MangaRoutes_default = router2;
 
 // src/routes/User/UserRoutes.ts

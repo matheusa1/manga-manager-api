@@ -43,13 +43,22 @@ export const CreateManga = async (req: Request, res: Response) => {
   }
 }
 
-export const updateManga = async (req: Request, res: Response) => {
+export const updateMangaVolumesOwned = async (req: Request, res: Response) => {
   const { volumesOwned, MangaID } = req.body
 
   if (!volumesOwned)
     return res.status(400).send({ error: 'Missing volumesOwned parameter' })
 
   try {
+    const manga = await prisma.manga.findMany({
+      where: {
+        MangaID,
+      },
+    })
+
+    if (manga.length < 1)
+      return res.status(404).send({ error: 'Manga doesnt exist' })
+
     await prisma.manga.update({
       where: {
         MangaID,
@@ -93,5 +102,27 @@ export const deleteManga = async (req: Request, res: Response) => {
     return res.status(200).send({ message: 'Manga deleted successfully' })
   } catch (error) {
     res.status(500).send(error)
+  }
+}
+
+export const updateMangaVolumes = async (req: Request, res: Response) => {
+  const { volumes, MangaID } = req.body
+
+  if (!volumes) return res.status(400).send({ error: 'Missing volumes' })
+
+  try {
+    await prisma.manga.update({
+      where: {
+        MangaID,
+      },
+      data: {
+        volumes,
+        updatedAt: new Date(),
+      },
+    })
+
+    return res.status(200).send({ message: 'Manga updated successfully' })
+  } catch (error) {
+    res.status(500).send({ error })
   }
 }
