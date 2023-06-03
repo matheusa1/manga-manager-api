@@ -40,6 +40,8 @@ var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient();
 
 // src/routes/User/UserController.ts
+var import_bcrypt = __toESM(require("bcrypt"));
+var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
 var GetMangas = async (req, res) => {
   const id = Number(req.params.id);
   try {
@@ -53,9 +55,76 @@ var GetMangas = async (req, res) => {
     return res.status(500).send({ error });
   }
 };
+var deleteUser = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id)
+    return res.status(422).send({ error: "Missing body parameter(s)" });
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        UserID: id
+      }
+    });
+    if (!user)
+      return res.status(404).send({ error: "User not found" });
+    const mangas = await prisma.manga.findMany({
+      where: {
+        userRelation: id
+      }
+    });
+    await mangas.forEach(async (manga) => {
+      await prisma.manga.delete({
+        where: {
+          MangaID: manga.MangaID
+        }
+      });
+    });
+    const response = await prisma.user.delete({
+      where: {
+        UserID: id
+      }
+    });
+    return res.status(200).send({ message: "User deleted" });
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
+};
+var updateUser = async (req, res) => {
+  const id = Number(req.params.id);
+  const { name, password } = req.body;
+  if (!id || !name || !password)
+    return res.status(422).send({ error: "Missing body parameter(s)" });
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        UserID: id
+      }
+    });
+    if (!user)
+      return res.status(404).send({ error: "User not found" });
+    const salt = await import_bcrypt.default.genSalt(12);
+    const passwordHash = await import_bcrypt.default.hash(password, salt);
+    const response = await prisma.user.update({
+      where: {
+        UserID: id
+      },
+      data: {
+        name,
+        password: passwordHash
+      }
+    });
+    const token = import_jsonwebtoken.default.sign(response, "mangaManager");
+    return res.status(200).send({
+      user: { id: response.UserID, name: response.name, email: response.email },
+      token
+    });
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
+};
 
 // src/Helpers/VerifyToken.ts
-var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
+var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
 
 // src/Helpers/GetToken.ts
 var getToken = (req) => {
@@ -75,7 +144,7 @@ var checkToken = async (req, res, next) => {
   if (!token)
     return res.status(401).send({ error: "Invalid Token" });
   try {
-    const verified = import_jsonwebtoken.default.verify(token, "mangaManager");
+    const verified = import_jsonwebtoken2.default.verify(token, "mangaManager");
     const user = prisma.user.findUnique({
       where: {
         //eslint-disable-next-line
@@ -97,4 +166,6 @@ var VerifyToken_default = checkToken;
 // src/routes/User/UserRoutes.ts
 var router = (0, import_express.Router)();
 router.get("/mangas/:id", VerifyToken_default, GetMangas);
+router.delete("/:id", VerifyToken_default, deleteUser);
+router.put("/:id", VerifyToken_default, updateUser);
 var UserRoutes_default = router;

@@ -273,6 +273,8 @@ var MangaRoutes_default = router2;
 var import_express3 = require("express");
 
 // src/routes/User/UserController.ts
+var import_bcrypt2 = __toESM(require("bcrypt"));
+var import_jsonwebtoken3 = __toESM(require("jsonwebtoken"));
 var GetMangas = async (req, res) => {
   const id = Number(req.params.id);
   try {
@@ -286,10 +288,79 @@ var GetMangas = async (req, res) => {
     return res.status(500).send({ error });
   }
 };
+var deleteUser = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id)
+    return res.status(422).send({ error: "Missing body parameter(s)" });
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        UserID: id
+      }
+    });
+    if (!user)
+      return res.status(404).send({ error: "User not found" });
+    const mangas = await prisma.manga.findMany({
+      where: {
+        userRelation: id
+      }
+    });
+    await mangas.forEach(async (manga) => {
+      await prisma.manga.delete({
+        where: {
+          MangaID: manga.MangaID
+        }
+      });
+    });
+    const response = await prisma.user.delete({
+      where: {
+        UserID: id
+      }
+    });
+    return res.status(200).send({ message: "User deleted" });
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
+};
+var updateUser = async (req, res) => {
+  const id = Number(req.params.id);
+  const { name, password } = req.body;
+  if (!id || !name || !password)
+    return res.status(422).send({ error: "Missing body parameter(s)" });
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        UserID: id
+      }
+    });
+    if (!user)
+      return res.status(404).send({ error: "User not found" });
+    const salt = await import_bcrypt2.default.genSalt(12);
+    const passwordHash = await import_bcrypt2.default.hash(password, salt);
+    const response = await prisma.user.update({
+      where: {
+        UserID: id
+      },
+      data: {
+        name,
+        password: passwordHash
+      }
+    });
+    const token = import_jsonwebtoken3.default.sign(response, "mangaManager");
+    return res.status(200).send({
+      user: { id: response.UserID, name: response.name, email: response.email },
+      token
+    });
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
+};
 
 // src/routes/User/UserRoutes.ts
 var router3 = (0, import_express3.Router)();
 router3.get("/mangas/:id", VerifyToken_default, GetMangas);
+router3.delete("/:id", VerifyToken_default, deleteUser);
+router3.put("/:id", VerifyToken_default, updateUser);
 var UserRoutes_default = router3;
 
 // src/routes/index.ts
