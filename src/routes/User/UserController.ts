@@ -30,6 +30,8 @@ export const deleteUser = async (req: Request, res: Response) => {
       },
     })
 
+    
+
     if (!user) return res.status(404).send({ error: 'User not found' })
 
     const mangas = await prisma.manga.findMany({
