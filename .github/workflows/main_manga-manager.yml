@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'manga-manager'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_700791E0771140AF803AFB245D67BA49 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9BFFE4D8F68847F4A3E5DD50BAFA6B4E }}
           package: .
